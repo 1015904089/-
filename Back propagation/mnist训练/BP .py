@@ -15,7 +15,7 @@ def unroll(m1, m2):
 
 
 def get_train_pattern():
-    curdir = "Y://exercise/Back propagation/bpneuralnet"
+    curdir = "Y://exercise/Back propagation/mnist训练"
     train = loadmat(curdir + "/mnist_train.mat")["mnist_train"]
     train_label = loadmat(curdir + "/mnist_train_labels.mat")["mnist_train_labels"]
     train = np.where(train > 180, 1, 0)  # 二值化
@@ -23,7 +23,7 @@ def get_train_pattern():
 
 
 def get_test_pattern():
-    curdir = "Y://exercise/Back propagation/bpneuralnet/mnist_test"
+    curdir = "Y://exercise/Back propagation/mnist训练/mnist_test"
     test_img = []
     test_label = []
     for i in range(10):
@@ -160,10 +160,12 @@ def scan(picture, theta):
 
 if __name__ == "__main__":
     dataX, datay = get_train_pattern()
-    idx = np.random.choice(np.arange(dataX.shape[0]), 5000)
+    idx = np.random.choice(np.arange(dataX.shape[0]), 15000)#由于60000个训练太慢了所以随机抽15000个样本作为训练集
     X = dataX[idx]
     y = datay[idx]
-    Xt , yt = get_test_pattern()
+    
+
+    #初始化参数
     input_size = X.shape[1]
     hidden_size = 25
     output_size = 10
@@ -174,16 +176,35 @@ if __name__ == "__main__":
     theta = unroll(theta1, theta2)
     # sample_show(X)
     X = np.insert(X, 0, 1, axis=1)
-    Xt = np.insert(Xt, 0, 1, axis=1)
-
+    
+    #训练
     result1 = minimize(fun=backpropagation, x0=theta,
                        args=(X, y, learningRate, input_size,
                              hidden_size, output_size),
                        method='TNC', jac=True, options={'maxiter': 250})
-    result_show(result1.x, Xt, yt, input_size, hidden_size, output_size)
-
-    target1 = 'Y://exercise/Back propagation/bpneuralnet/3.png'
-    target2 = 'Y://exercise/Back propagation/bpneuralnet/2.png'
+    
+    # 测试
+    # test_img, test_label = get_test_pattern()
+    # test_img = np.insert(test_img, 0, 1, axis=1)
+    # result_show(result1.x, test_img, test_label, input_size, hidden_size, output_size)
+    '''
+             precision    recall  f1-score   support
+          0       0.93      0.97      0.95       980
+          1       0.97      0.96      0.97      1135
+          2       0.90      0.92      0.91      1032
+          3       0.87      0.89      0.88      1010
+          4       0.91      0.92      0.91       982
+          5       0.88      0.87      0.87       892
+          6       0.93      0.93      0.93       958
+          7       0.94      0.91      0.92      1028
+          8       0.89      0.87      0.88       974
+          9       0.89      0.89      0.89      1009
+avg / total       0.91      0.91      0.91     10000
+    '''
+    
+    # 检测图像并输出
+    target1 = 'Y://exercise/Back propagation/mnist训练/3.png'
+    target2 = 'Y://exercise/Back propagation/mnist训练/2.png'
 
     scan(target1, result1.x)
-    scan(target2, result1.x)
+
