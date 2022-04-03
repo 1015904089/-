@@ -103,10 +103,10 @@ def backpropagation(theta, X, y, learningRate, input_size, hidden_size, output_s
     delta1 = np.zeros(theta1.shape)  # (25, 401)
     delta2 = np.zeros(theta2.shape)  # (10, 26)
     J = cost(theta, X, y, learningRate, input_size, hidden_size, output_size)
+    
+    #计算error
     d3 = h - y  # (5000, 10)
-
-    z2 = np.insert(z2, 0, 1, axis=1)  # (5000, 26)
-    d2 = np.multiply((theta2.T * d3.T).T, dsigmiod(z2))  # (5000, 26)
+    d2 = np.multiply((theta2.T * d3.T).T, np.multiply(a2, (1 - a2)))  # (5000, 26)
 
     delta1 = delta1 + (d2[:, 1:]).T * a1  # (25,401)
     delta2 = delta2 + d3.T * a2  # (10,26)
@@ -114,11 +114,11 @@ def backpropagation(theta, X, y, learningRate, input_size, hidden_size, output_s
     delta1 = delta1 / len(X)
     delta2 = delta2 / len(X)
 
-    # add the gradient regularization term
+    # 加入正则项
     delta1[:, 1:] = delta1[:, 1:] + (theta1[:, 1:] * learningRate) / len(X)
     delta2[:, 1:] = delta2[:, 1:] + (theta2[:, 1:] * learningRate) / len(X)
 
-    # unravel the gradient matrices into a single array
+    # 合并
     grad = np.concatenate((np.ravel(delta1), np.ravel(delta2)))
 
     return J, grad
