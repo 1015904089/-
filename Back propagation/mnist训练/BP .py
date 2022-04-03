@@ -10,23 +10,19 @@ from scipy.optimize import minimize
 import PIL.ImageOps
 
 
-def unroll(m1, m2):
-    return np.concatenate((np.ravel(m1), np.ravel(m2)))
-
-
 def get_train_pattern():
-    curdir = "Y://exercise/Back propagation/mnist训练"
+    curdir = "Y://exercise/Back propagation/mnist"
     train = loadmat(curdir + "/mnist_train.mat")["mnist_train"]
     train_label = loadmat(curdir + "/mnist_train_labels.mat")["mnist_train_labels"]
     train = np.where(train > 180, 1, 0)  # 二值化
-    idx = np.random.choice(np.arange(train.shape[0]), 15000)  # 由于60000个训练太慢了所以随机抽15000个样本作为训练集
+    idx = np.random.choice(np.arange(train.shape[0]), 5000)  # 由于60000个训练太慢了所以随机抽15000个样本作为训练集
     X = train[idx]
     y = train_label[idx]
     return X, y
 
 
 def get_test_pattern():
-    curdir = "Y://exercise/Back propagation/mnist训练/mnist_test"
+    curdir = "Y://exercise/Back propagation/mnist/mnist_test"
     test_img = []
     test_label = []
     for i in range(10):
@@ -39,6 +35,10 @@ def get_test_pattern():
             test_label.append(i)
 
     return np.array(test_img), np.array(test_label)
+
+
+def unroll(m1, m2):
+    return np.concatenate((np.ravel(m1), np.ravel(m2)))
 
 
 def reshapen(theta, input_size, hidden_size, output_size):
@@ -61,10 +61,6 @@ def sample_show(X):
 
 def sigmiod(z):
     return 1 / (1 + np.exp(-z))
-
-
-def dsigmiod(z):
-    return np.multiply(sigmiod(z), (1 - sigmiod(z)))
 
 
 def randomtheta(lin, lout, epsilon):
@@ -188,8 +184,10 @@ if __name__ == "__main__":
                        method='TNC', jac=True, options={'maxiter': 250})
 
     # 测试
+
     result_show(result1.x, test_img, test_label, input_size, hidden_size, output_size)
-    '''
+
+''''  
              precision    recall  f1-score   support
           0       0.93      0.97      0.95       980
           1       0.97      0.96      0.97      1135
@@ -202,10 +200,9 @@ if __name__ == "__main__":
           8       0.89      0.87      0.88       974
           9       0.89      0.89      0.89      1009
 avg / total       0.91      0.91      0.91     10000
-    '''
 
-    # 检测图像并输出
-    img1 = 'Y://exercise/Back propagation/mnist训练/3.png'
-    img2 = 'Y://exercise/Back propagation/mnist训练/2.png'
+'''''
+img1 = 'Y://exercise/Back propagation/mnist/3.png'
+img2 = 'Y://exercise/Back propagation/mnist/2.png'
 
-    scan(img1, result1.x)
+scan(img1, result1.x)
