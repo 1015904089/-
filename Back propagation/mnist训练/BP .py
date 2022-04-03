@@ -19,7 +19,10 @@ def get_train_pattern():
     train = loadmat(curdir + "/mnist_train.mat")["mnist_train"]
     train_label = loadmat(curdir + "/mnist_train_labels.mat")["mnist_train_labels"]
     train = np.where(train > 180, 1, 0)  # 二值化
-    return train, train_label
+    idx = np.random.choice(np.arange(train.shape[0]), 15000)  # 由于60000个训练太慢了所以随机抽15000个样本作为训练集
+    X = train[idx]
+    y = train_label[idx]
+    return X, y
 
 
 def get_test_pattern():
@@ -103,8 +106,8 @@ def backpropagation(theta, X, y, learningRate, input_size, hidden_size, output_s
     delta1 = np.zeros(theta1.shape)  # (25, 401)
     delta2 = np.zeros(theta2.shape)  # (10, 26)
     J = cost(theta, X, y, learningRate, input_size, hidden_size, output_size)
-    
-    #计算error
+
+    # 计算error
     d3 = h - y  # (5000, 10)
     d2 = np.multiply((theta2.T * d3.T).T, np.multiply(a2, (1 - a2)))  # (5000, 26)
 
@@ -146,12 +149,12 @@ def result_show(theta, X, y, input_size, hidden_size, output_size):
 
 def scan(picture, theta):
     img = Image.open(picture)
-    img = img.resize((28, 28))  #修改图片分辨率
+    img = img.resize((28, 28))  # 修改图片分辨率
     img = img.convert('L')
-    img = PIL.ImageOps.invert(img)  #翻转颜色
-    img = img.convert('1')  
+    img = PIL.ImageOps.invert(img)  # 翻转颜色
+    img = img.convert('1')
     img_array = np.asarray(img, 'i')
-    img_vector = img_array.reshape(1,img_array.shape[0] * img_array.shape[1])
+    img_vector = img_array.reshape(1, img_array.shape[0] * img_array.shape[1])
     img_vector = np.insert(img_vector, 0, 1, axis=1)
     a1, z2, a2, z3, h = forward_propagation(img_vector, theta, input_size, hidden_size,
                                             output_size)
@@ -159,13 +162,14 @@ def scan(picture, theta):
 
 
 if __name__ == "__main__":
-    dataX, datay = get_train_pattern()
-    idx = np.random.choice(np.arange(dataX.shape[0]), 15000)#由于60000个训练太慢了所以随机抽15000个样本作为训练集
-    X = dataX[idx]
-    y = datay[idx]
-    
+    # 获得训练样本
+    X, y = get_train_pattern()
 
-    #初始化参数
+    # 获得测试样本
+    test_img, test_label = get_test_pattern()
+    test_img = np.insert(test_img, 0, 1, axis=1)
+
+    # 初始化参数
     input_size = X.shape[1]
     hidden_size = 25
     output_size = 10
@@ -176,19 +180,15 @@ if __name__ == "__main__":
     theta = unroll(theta1, theta2)
     # sample_show(X)
     X = np.insert(X, 0, 1, axis=1)
-    
-    
-    #训练
+
+    # 训练
     result1 = minimize(fun=backpropagation, x0=theta,
                        args=(X, y, learningRate, input_size,
                              hidden_size, output_size),
                        method='TNC', jac=True, options={'maxiter': 250})
-    
-    
+
     # 测试
-    # test_img, test_label = get_test_pattern()
-    # test_img = np.insert(test_img, 0, 1, axis=1)
-    # result_show(result1.x, test_img, test_label, input_size, hidden_size, output_size)
+    result_show(result1.x, test_img, test_label, input_size, hidden_size, output_size)
     '''
              precision    recall  f1-score   support
           0       0.93      0.97      0.95       980
@@ -203,8 +203,7 @@ if __name__ == "__main__":
           9       0.89      0.89      0.89      1009
 avg / total       0.91      0.91      0.91     10000
     '''
-    
-    
+
     # 检测图像并输出
     img1 = 'Y://exercise/Back propagation/mnist训练/3.png'
     img2 = 'Y://exercise/Back propagation/mnist训练/2.png'
