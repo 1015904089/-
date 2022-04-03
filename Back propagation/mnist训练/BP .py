@@ -146,10 +146,10 @@ def result_show(theta, X, y, input_size, hidden_size, output_size):
 
 def scan(picture, theta):
     img = Image.open(picture)
-    img = img.resize((28, 28))
+    img = img.resize((28, 28))  #修改图片分辨率
     img = img.convert('L')
-    img = PIL.ImageOps.invert(img)
-    img = img.convert('1')
+    img = PIL.ImageOps.invert(img)  #翻转颜色
+    img = img.convert('1')  
     img_array = np.asarray(img, 'i')
     img_vector = img_array.reshape(1,img_array.shape[0] * img_array.shape[1])
     img_vector = np.insert(img_vector, 0, 1, axis=1)
@@ -177,11 +177,13 @@ if __name__ == "__main__":
     # sample_show(X)
     X = np.insert(X, 0, 1, axis=1)
     
+    
     #训练
     result1 = minimize(fun=backpropagation, x0=theta,
                        args=(X, y, learningRate, input_size,
                              hidden_size, output_size),
                        method='TNC', jac=True, options={'maxiter': 250})
+    
     
     # 测试
     # test_img, test_label = get_test_pattern()
@@ -202,9 +204,9 @@ if __name__ == "__main__":
 avg / total       0.91      0.91      0.91     10000
     '''
     
+    
     # 检测图像并输出
-    target1 = 'Y://exercise/Back propagation/mnist训练/3.png'
-    target2 = 'Y://exercise/Back propagation/mnist训练/2.png'
+    img1 = 'Y://exercise/Back propagation/mnist训练/3.png'
+    img2 = 'Y://exercise/Back propagation/mnist训练/2.png'
 
-    scan(target1, result1.x)
-
+    scan(img1, result1.x)
